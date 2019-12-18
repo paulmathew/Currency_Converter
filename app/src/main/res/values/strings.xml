@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Currency Converter</string>
+    <string name="amount_label">1.00</string>
+    <string name="loading_label">Loading Data</string>
+    <string name="title_activity_main2">Main2Activity</string>
+    <string name="data">Data...!</string>
+</resources>
