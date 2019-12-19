@@ -43,6 +43,7 @@ public class CurrencyPresenter implements  ICurrenctPresenter {
     private CurrencyPreference currencyPreference;
     private Double currentMultiplier=1.0;
     CompositeDisposable  compositeDisposable;
+    Disposable disposable;
     public CurrencyPresenter(MainActivityView view, Context context)
     {
         this.view=view;
@@ -54,7 +55,7 @@ public class CurrencyPresenter implements  ICurrenctPresenter {
         currencyPreference.saveData(Constants.CURRENT_MULTIPLIER,"1.0");
         compositeDisposable = new CompositeDisposable();
 
-        String rate=(currencyPreference.getData(Constants.CURRENT_RATE).equals(""))? "EUR":currencyPreference.getData(Constants.CURRENT_RATE);
+        String rate=(currencyPreference.getData(Constants.CURRENT_RATE).equals("1"))? "EUR":currencyPreference.getData(Constants.CURRENT_RATE);
         fetchCurrencyList(rate,false);
         //apiRepeatFn();
         currentMultiplier=Double.parseDouble((currencyPreference.
@@ -96,6 +97,7 @@ public class CurrencyPresenter implements  ICurrenctPresenter {
                     @Override
                     public void onSubscribe(Disposable d) {
                         //Log.e(TAG, " onSubscribe : " + d.isDisposed());
+                        disposable=d;
                     }
 
                     @Override
@@ -243,6 +245,8 @@ public class CurrencyPresenter implements  ICurrenctPresenter {
                 if(e instanceof TimeoutException || e instanceof SocketTimeoutException || e instanceof UnknownHostException)
                 {
                     view.connectionTimeoutAlert();
+                    if(isRepeat)
+                        disposable.dispose();
                 }
                 else
                     view.errorAlert(e.getLocalizedMessage());

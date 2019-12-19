@@ -133,7 +133,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityView 
         DecimalFormat decimalFormat = new DecimalFormat("#,##0.0000");
         for(int i=0;i<listItems.size();i++)
         {
-            Log.e("Hello date "+listItems.get(i).getRate_name(),i+" "+currencyPreference.getData(Constants.CURRENT_SINGLERATE+listItems.get(i).getRate_name()));
+
             if(i==0)
             {
                 listItems.get(i).setRate(decimalFormat.format(
@@ -171,19 +171,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityView 
 
     @Override
     public void repeateListUpdate(ArrayList<ListItems> listItem,double multiplier) {
-//
-//        try {
-//            if (listItems.size() > 0)
-//                listItems.clear();
-//            else
-//                listItems = new ArrayList<>();
-//        }
-//        catch (Exception e)
-//        {
-//            listItems=new ArrayList<>();
-//        }
-//        listItems.addAll(listItem);
-        //    Log.e("Multiplier",""+multiplier);
+
         DecimalFormat decimalFormat = new DecimalFormat("#,##0.0000");
         for(int i=0;i<listItems.size();i++)
         {
@@ -199,9 +187,6 @@ public class MainActivity extends AppCompatActivity implements MainActivityView 
 
             }
         }
-
-
-
         new Thread((new Runnable() {
             @Override
             public void run() {
@@ -216,8 +201,6 @@ public class MainActivity extends AppCompatActivity implements MainActivityView 
 
                         for(int i=1;i<listItems.size();i++) {
                             currencyAdapter.notifyItemChanged(i);
-
-
                         }
                     }
                 });
@@ -230,7 +213,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityView 
 
     @Override
     public void connectionTimeoutAlert() {
-        // currencyPresenter.disposeDisposable().dispose();
+       // currencyPresenter.disposeDisposable().dispose();
         shimmerFrameLayout.stopShimmerAnimation();
         shimmerFrameLayout.setVisibility(View.GONE);
         connectionTimeoutBuilder= new AlertDialog.Builder(MainActivity.this)
@@ -246,7 +229,8 @@ public class MainActivity extends AppCompatActivity implements MainActivityView 
                     {
                         shimmerFrameLayout.startShimmerAnimation();
                         shimmerFrameLayout.setVisibility(View.VISIBLE);
-                        String rate=(currencyPreference.getData(Constants.CURRENT_RATE).equals(""))? "EUR":currencyPreference.getData(Constants.CURRENT_RATE);
+                        String rate=(currencyPreference.getData(Constants.CURRENT_RATE).equals("1"))? "EUR":currencyPreference.getData(Constants.CURRENT_RATE);
+
                         currencyPresenter.fetchCurrencyList(rate,false);
 
                     }
@@ -256,7 +240,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityView 
                     @Override
                     public void onClick(DialogInterface dialog, int which)
                     {
-                        Toast.makeText(MainActivity.this, "You Clicked on Cancel", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, "You are Offline", Toast.LENGTH_SHORT).show();
                     }
                 }).show();
 
@@ -284,7 +268,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityView 
                     @Override
                     public void onClick(DialogInterface dialog, int which)
                     {
-                        Toast.makeText(MainActivity.this, "You Clicked on Cancel", Toast.LENGTH_SHORT).show();
+
                     }
                 }).show();
 
@@ -306,4 +290,5 @@ public class MainActivity extends AppCompatActivity implements MainActivityView 
         currencyPresenter.disposeDisposable().dispose();
 
     }
+
 }

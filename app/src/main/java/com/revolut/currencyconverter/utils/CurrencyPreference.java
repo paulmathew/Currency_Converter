@@ -29,7 +29,7 @@ public class CurrencyPreference {
     public String getData(String key) {
       //  Log.e("Key ",""+key);
         if (sharedPreferences!= null) {
-           return sharedPreferences.getString(key, "");
+           return sharedPreferences.getString(key, "1");
         }
         return "";         
     }
