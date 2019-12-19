@@ -1,10 +1,9 @@
-package com.revolut.currencyconverter.presenter;
+package com.revolut.currencyconverter.MVP;
 
 import android.content.Context;
 import android.util.Log;
 
 import com.google.gson.JsonObject;
-import com.revolut.currencyconverter.dateBase.CurrencyDataBase;
 import com.revolut.currencyconverter.httpClient.APIClient;
 import com.revolut.currencyconverter.model.CurrencyRates;
 import com.revolut.currencyconverter.model.ListItems;
@@ -22,14 +21,11 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import io.reactivex.Completable;
-import io.reactivex.CompletableObserver;
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Action;
 import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 

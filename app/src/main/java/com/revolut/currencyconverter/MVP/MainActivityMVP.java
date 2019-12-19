@@ -1,4 +1,4 @@
-package com.revolut.currencyconverter;
+package com.revolut.currencyconverter.MVP;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -17,10 +17,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.facebook.shimmer.ShimmerFrameLayout;
-import com.revolut.currencyconverter.adapterClass.CurrencyAdapter;
+import com.revolut.currencyconverter.R;
 import com.revolut.currencyconverter.dateBase.CurrencyDataBase;
 import com.revolut.currencyconverter.model.ListItems;
-import com.revolut.currencyconverter.presenter.CurrencyPresenter;
 import com.revolut.currencyconverter.utils.Constants;
 import com.revolut.currencyconverter.utils.CurrencyPreference;
 import com.revolut.currencyconverter.view.MainActivityView;
@@ -32,7 +31,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.disposables.CompositeDisposable;
 
-public class MainActivity extends AppCompatActivity implements MainActivityView {
+public class MainActivityMVP extends AppCompatActivity implements MainActivityView {
 
     CurrencyPresenter currencyPresenter;
     @BindView(R.id.recyclerView)
@@ -66,7 +65,9 @@ public class MainActivity extends AppCompatActivity implements MainActivityView 
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                String rate=(currencyPreference.getData(Constants.CURRENT_RATE).equals("1"))? "EUR":currencyPreference.getData(Constants.CURRENT_RATE);
 
+                currencyPresenter.fetchCurrencyList(rate,false);
                 swipeRefreshLayout.setRefreshing(false);
             }
         });
@@ -216,7 +217,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityView 
        // currencyPresenter.disposeDisposable().dispose();
         shimmerFrameLayout.stopShimmerAnimation();
         shimmerFrameLayout.setVisibility(View.GONE);
-        connectionTimeoutBuilder= new AlertDialog.Builder(MainActivity.this)
+        connectionTimeoutBuilder= new AlertDialog.Builder(MainActivityMVP.this)
                 .setIcon(R.mipmap.ic_launcher)
                 .setTitle("Network Connection Problem")
                 .setMessage("Problem Occurred While Connecting With The Server Please Connect To The Internet")
@@ -240,7 +241,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityView 
                     @Override
                     public void onClick(DialogInterface dialog, int which)
                     {
-                        Toast.makeText(MainActivity.this, "You are Offline", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivityMVP.this, "You are Offline", Toast.LENGTH_SHORT).show();
                     }
                 }).show();
 
@@ -249,7 +250,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityView 
     @Override
     public void errorAlert(String msg) {
         currencyPresenter.disposeDisposable().dispose();
-        errorAlertBuilder =new AlertDialog.Builder(MainActivity.this)
+        errorAlertBuilder =new AlertDialog.Builder(MainActivityMVP.this)
                 .setIcon(R.mipmap.ic_launcher)
                 .setTitle("Alert")
                 .setMessage(msg)
@@ -260,7 +261,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityView 
                     @Override
                     public void onClick(DialogInterface dialog, int which)
                     {
-                        currencyPresenter=new CurrencyPresenter(MainActivity.this,getApplicationContext());
+                        currencyPresenter=new CurrencyPresenter(MainActivityMVP.this,getApplicationContext());
                     }
                 })
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener()

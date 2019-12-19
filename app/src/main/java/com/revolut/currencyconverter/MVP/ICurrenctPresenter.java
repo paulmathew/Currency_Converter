@@ -1,9 +1,6 @@
-package com.revolut.currencyconverter.presenter;
+package com.revolut.currencyconverter.MVP;
 
 import com.google.gson.JsonObject;
-import com.revolut.currencyconverter.model.CurrencyRates;
-
-import java.util.List;
 
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;

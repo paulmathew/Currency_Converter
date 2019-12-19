@@ -1,4 +1,4 @@
-package com.revolut.currencyconverter.adapterClass;
+package com.revolut.currencyconverter.MVP;
 
 import android.content.Context;
 import android.text.Editable;
@@ -15,7 +15,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.revolut.currencyconverter.R;
 import com.revolut.currencyconverter.model.ListItems;
-import com.revolut.currencyconverter.presenter.CurrencyPresenter;
 import com.revolut.currencyconverter.utils.Constants;
 import com.revolut.currencyconverter.utils.CurrencyPreference;
 
