@@ -18,8 +18,7 @@ public interface ICurrenctPresenter {
 
     public void apiRepeatFn();
     public  void updateRepeateMode(String mainRate);
-    public void deleteTable();
-    public  void insertIntoRateTable(List<CurrencyRates> listCurrencyRates);
+
     public DisposableSingleObserver<JsonObject> getCurrencyObserver(String mainRate,boolean isRepeat,boolean justUpdate);
     public  void attachDisposable(Disposable disposable);
     public CompositeDisposable disposeDisposable();

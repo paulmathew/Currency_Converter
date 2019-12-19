@@ -37,7 +37,7 @@ public class CurrencyPresenter implements  ICurrenctPresenter {
 
     private APIClient.ApiInterface apiInterface;
     private MainActivityView view;
-    private CurrencyDataBase currencyDataBase;
+
     private Context context;
     private String TAG="Hello";
     private CurrencyPreference currencyPreference;
@@ -50,7 +50,7 @@ public class CurrencyPresenter implements  ICurrenctPresenter {
         this.context=context;
         apiInterface=APIClient.getInstance().getApiInterface();
 
-        currencyDataBase=CurrencyDataBase.getInstance(context);
+
         currencyPreference=CurrencyPreference.getInstance(context);
         currencyPreference.saveData(Constants.CURRENT_MULTIPLIER,"1.0");
         compositeDisposable = new CompositeDisposable();
@@ -65,7 +65,6 @@ public class CurrencyPresenter implements  ICurrenctPresenter {
     @Override
     public void fetchCurrencyList(String mainRate,boolean justUpdate) {
 
-        deleteTable();
 
         Log.e("Main Rate ",""+mainRate);
 
@@ -127,8 +126,6 @@ public class CurrencyPresenter implements  ICurrenctPresenter {
 
     @Override
     public void updateRepeateMode(String mainRate) {
-        // Delete The DB
-        deleteTable();
 
         attachDisposable(  apiInterface.getResponse(mainRate)
                 .subscribeOn(Schedulers.io())
@@ -137,51 +134,7 @@ public class CurrencyPresenter implements  ICurrenctPresenter {
 
     }
 
-    @Override
-    public void deleteTable() {
-        Completable.fromAction(new Action() {
-            @Override
-            public void run() throws Exception {
-                currencyDataBase.currencyDao().clearTable();
 
-            }
-        })
-                .subscribeOn(Schedulers.io()).subscribe();
-
-    }
-
-    @Override
-    public void insertIntoRateTable(List<CurrencyRates> listCurrencyRates) {
-
-        Log.e("total from API",""+listCurrencyRates.size());
-        Completable.fromAction(new Action() {
-            @Override
-            public void run() throws Exception {
-                currencyDataBase.currencyDao().insertRate(listCurrencyRates);
-
-            }
-        })
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(new CompletableObserver() {
-                    @Override
-                    public void onSubscribe(Disposable d) {
-
-                    }
-
-                    @Override
-                    public void onComplete() {
-                        // getRatesFromDB();
-                        //apiRepeatFn();
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-
-                    }
-                });
-    }
 
     @Override
     public DisposableSingleObserver<JsonObject> getCurrencyObserver(String mainRate,boolean isRepeat,boolean justUpdate) {
