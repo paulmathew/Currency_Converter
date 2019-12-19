@@ -1,15 +1,20 @@
-package com.revolut.currencyconverter.MVP;
+package com.revolut.currencyconverter.viewModel;
 
 import android.content.Context;
 import android.util.Log;
 
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
+
 import com.google.gson.JsonObject;
+import com.revolut.currencyconverter.ApplicationClass;
+import com.revolut.currencyconverter.dateBase.CurrencyDataBase;
 import com.revolut.currencyconverter.httpClient.APIClient;
 import com.revolut.currencyconverter.model.CurrencyRates;
 import com.revolut.currencyconverter.model.ListItems;
 import com.revolut.currencyconverter.utils.Constants;
 import com.revolut.currencyconverter.utils.CurrencyPreference;
-import com.revolut.currencyconverter.view.MainActivityView;
 
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
@@ -21,46 +26,61 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import io.reactivex.Completable;
+import io.reactivex.CompletableObserver;
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Action;
 import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 
-public class CurrencyPresenter implements  ICurrenctPresenter {
+public class CurrencyViewModel extends ViewModel  implements CurrencyViewModelInterface{
 
     private APIClient.ApiInterface apiInterface;
-    private MainActivityView view;
-
-    private Context context;
-    private String TAG="Hello";
     private CurrencyPreference currencyPreference;
+
     private Double currentMultiplier=1.0;
     CompositeDisposable  compositeDisposable;
-    Disposable disposable;
-    public CurrencyPresenter(MainActivityView view, Context context)
+
+
+    private final MutableLiveData<ArrayList<ListItems>> currencyListItem=new MutableLiveData<>();
+    private  final MutableLiveData<Boolean> isError=new MutableLiveData<>();
+    private final MutableLiveData<String>errorMsg=new MutableLiveData<>();
+
+    public CurrencyViewModel()
     {
-        this.view=view;
-        this.context=context;
+
+
         apiInterface=APIClient.getInstance().getApiInterface();
 
-
-        currencyPreference=CurrencyPreference.getInstance(context);
+        currencyPreference= ApplicationClass.currencyPreference;
         currencyPreference.saveData(Constants.CURRENT_MULTIPLIER,"1.0");
         compositeDisposable = new CompositeDisposable();
 
-        String rate=(currencyPreference.getData(Constants.CURRENT_RATE).equals("1"))? "EUR":currencyPreference.getData(Constants.CURRENT_RATE);
+        String rate=(currencyPreference.getData(Constants.CURRENT_RATE).equals(""))? "EUR":currencyPreference.getData(Constants.CURRENT_RATE);
         fetchCurrencyList(rate,false);
         //apiRepeatFn();
         currentMultiplier=Double.parseDouble((currencyPreference.
                 getData(Constants.CURRENT_MULTIPLIER).equals(""))? "1.0":currencyPreference.getData(Constants.CURRENT_MULTIPLIER));
     }
+    @Override
+    public LiveData<ArrayList<ListItems>> getCurrencyList()
+    {
+
+        return currencyListItem;
+    }
+    public  LiveData<Boolean> getErrors()
+    {
+        return isError;
+    }
+    public  LiveData<String>getErrorMsg(){return  errorMsg;}
+
 
     @Override
     public void fetchCurrencyList(String mainRate,boolean justUpdate) {
-
 
         Log.e("Main Rate ",""+mainRate);
 
@@ -70,15 +90,6 @@ public class CurrencyPresenter implements  ICurrenctPresenter {
                 .subscribeWith(getCurrencyObserver( mainRate,false,justUpdate)));
     }
 
-    @Override
-    public void listScrollUp(int position) {
-        view.listScrollUp(position);
-    }
-
-    @Override
-    public void updateListdata(double val) {
-        view.updateList(val);
-    }
 
 
     @Override
@@ -92,7 +103,6 @@ public class CurrencyPresenter implements  ICurrenctPresenter {
                     @Override
                     public void onSubscribe(Disposable d) {
                         //Log.e(TAG, " onSubscribe : " + d.isDisposed());
-                        disposable=d;
                     }
 
                     @Override
@@ -101,20 +111,22 @@ public class CurrencyPresenter implements  ICurrenctPresenter {
                         String rate = (currencyPreference.getData(Constants.CURRENT_RATE).equals("")) ? "EUR" : currencyPreference.getData(Constants.CURRENT_RATE);
                         updateRepeateMode(rate);
 
-
+                        //isError.setValue(false);
                     }
 
                     @Override
                     public void onError(Throwable e) {
 
-                    //    Log.e(TAG, " onError : " + e.getMessage());
-                        view.errorAlert(e.getMessage());
+                        Log.e("Is This "," 1");
+
+//                        isError.setValue(true);
+//                        errorMsg.setValue("errorAlert"+e.getMessage());
                     }
 
                     @Override
                     public void onComplete() {
 
-                       // Log.e(TAG, " onComplete");
+                        Log.e("On", " onComplete");
                     }
                 });
 
@@ -131,10 +143,9 @@ public class CurrencyPresenter implements  ICurrenctPresenter {
     }
 
 
-
     @Override
-    public DisposableSingleObserver<JsonObject> getCurrencyObserver(String mainRate,boolean isRepeat,boolean justUpdate) {
-        view.closeAllAlert();
+    public DisposableSingleObserver<JsonObject> getCurrencyObserver(String mainRate, boolean isRepeat, boolean justUpdate) {
+
 
         return new DisposableSingleObserver<JsonObject>() {
             @Override
@@ -143,7 +154,7 @@ public class CurrencyPresenter implements  ICurrenctPresenter {
                 jsonObject1=jsonObject.getAsJsonObject("rates");
                 Set<?> s =  jsonObject1.keySet();
                 Iterator<?> i = s.iterator();
-                ArrayList<ListItems>items=new ArrayList<>();
+                ArrayList<ListItems> items=new ArrayList<>();
                 DecimalFormat decimalFormat = new DecimalFormat("#,##0.0000");
                 List<CurrencyRates> listCurrencyRates=new ArrayList<>();
                 currentMultiplier=Double.parseDouble((currencyPreference.
@@ -173,32 +184,42 @@ public class CurrencyPresenter implements  ICurrenctPresenter {
                     currencyPreference.saveData(Constants.CURRENT_SINGLERATE+rate_name,""+jsonObject1.get(rate_name));
 
                 }while(i.hasNext());
-
+                isError.setValue(false);
                 if(!justUpdate) {
+
+                    currencyListItem.setValue(items);
                     if (!isRepeat) {
-                        view.fetchList(items);
+
+                        currencyPreference.saveBoolean(Constants.IS_REPEATING,true);
                         apiRepeatFn();
 
                     } else {
-                        view.repeateListUpdate(items,currentMultiplier);
+
 
                     }
                 }
                 else {
                 }
+
             }
 
             @Override
             public void onError(Throwable e) {
                 System.out.println(e.getLocalizedMessage());
+                isError.setValue(true);
                 if(e instanceof TimeoutException || e instanceof SocketTimeoutException || e instanceof UnknownHostException)
                 {
-                    view.connectionTimeoutAlert();
-                    if(isRepeat)
-                        disposable.dispose();
+                    // view.connectionTimeoutAlert();
+
+                    errorMsg.setValue("connectionTimeOut");
                 }
                 else
-                    view.errorAlert(e.getLocalizedMessage());
+                {
+                    // view.errorAlert(e.getLocalizedMessage());
+
+                    errorMsg.setValue("errorAlert"+e.getMessage());
+                }
+
 
             }
         };
@@ -215,6 +236,4 @@ public class CurrencyPresenter implements  ICurrenctPresenter {
         return  compositeDisposable;
 
     }
-
-
 }

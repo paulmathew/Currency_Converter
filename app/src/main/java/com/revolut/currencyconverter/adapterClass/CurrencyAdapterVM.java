@@ -1,4 +1,4 @@
-package com.revolut.currencyconverter.MVP;
+package com.revolut.currencyconverter.adapterClass;
 
 import android.content.Context;
 import android.text.Editable;
@@ -17,23 +17,33 @@ import com.revolut.currencyconverter.R;
 import com.revolut.currencyconverter.model.ListItems;
 import com.revolut.currencyconverter.utils.Constants;
 import com.revolut.currencyconverter.utils.CurrencyPreference;
+import com.revolut.currencyconverter.viewModel.AdapterCallBack;
 
 import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class CurrencyAdapter  extends RecyclerView.Adapter<CurrencyAdapter.ViewHolder> {
+public class CurrencyAdapterVM extends RecyclerView.Adapter<CurrencyAdapterVM.ViewHolder> {
     ArrayList<ListItems> listItems;
-    CurrencyPresenter  currencyPresenter;
+
     CurrencyPreference currencyPreference;
     Double multiplier=1.0;
+    Context context;
+    AdapterCallBack adapterCallBack;
 
 
-    public CurrencyAdapter(ArrayList<ListItems> listItems, CurrencyPresenter currencyPresenter, Context applicationContext)
+    public CurrencyAdapterVM(ArrayList<ListItems> listItems, Context applicationContext, AdapterCallBack callback)
     {
+//        try {
+//            adapterCallBack = ((AdapterCallBack) context);
+//        } catch (ClassCastException e) {
+//            Log.e("Call back ",""+e.getLocalizedMessage());
+//
+//        }
+        this.adapterCallBack=callback;
         this.listItems=listItems;
-        this.currencyPresenter=currencyPresenter;
+        this.context=applicationContext;
         currencyPreference= CurrencyPreference.getInstance(applicationContext);
 
 
@@ -99,7 +109,9 @@ public class CurrencyAdapter  extends RecyclerView.Adapter<CurrencyAdapter.ViewH
                         listItems.get(position).setRate("");
                         //   notifyItemChanged(position);
                     }
-                    currencyPresenter.updateListdata(inputValue);
+
+                    adapterCallBack.updateList(inputValue);
+
                 }
             });
             try {
@@ -109,6 +121,7 @@ public class CurrencyAdapter  extends RecyclerView.Adapter<CurrencyAdapter.ViewH
             {
 
             }
+
         }
         else if(viewType==0)
         {
@@ -119,7 +132,8 @@ public class CurrencyAdapter  extends RecyclerView.Adapter<CurrencyAdapter.ViewH
                 public void onClick(View v) {
 
                     currencyPreference.saveData(Constants.CURRENT_RATE,listItems.get(position).getRate_name());
-                    currencyPresenter.listScrollUp(position);
+
+                    adapterCallBack.listScrollUp(position);
                 }
             });
             holder.amount.setEnabled(false);
