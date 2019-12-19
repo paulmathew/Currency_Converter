@@ -244,7 +244,7 @@ public class MainActivityMVVM extends AppCompatActivity implements AdapterCallBa
                     {
                         shimmerFrameLayout.startShimmerAnimation();
                         shimmerFrameLayout.setVisibility(View.VISIBLE);
-                        String rate=(currencyPreference.getData(Constants.CURRENT_RATE).equals(""))? "EUR":currencyPreference.getData(Constants.CURRENT_RATE);
+                        String rate=(currencyPreference.getData(Constants.CURRENT_RATE).equals("1"))? "EUR":currencyPreference.getData(Constants.CURRENT_RATE);
                         //  currencyPresenter.fetchCurrencyList(rate,false);
                         currencyViewModel.getCurrencyList().removeObservers(MainActivityMVVM.this);
                         currencyPreference.saveBoolean(Constants.IS_REPEATING,false);

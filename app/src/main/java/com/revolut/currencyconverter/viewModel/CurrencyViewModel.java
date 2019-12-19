@@ -60,11 +60,11 @@ public class CurrencyViewModel extends ViewModel  implements CurrencyViewModelIn
         currencyPreference.saveData(Constants.CURRENT_MULTIPLIER,"1.0");
         compositeDisposable = new CompositeDisposable();
 
-        String rate=(currencyPreference.getData(Constants.CURRENT_RATE).equals(""))? "EUR":currencyPreference.getData(Constants.CURRENT_RATE);
+        String rate=(currencyPreference.getData(Constants.CURRENT_RATE).equals("1"))? "EUR":currencyPreference.getData(Constants.CURRENT_RATE);
         fetchCurrencyList(rate,false);
         //apiRepeatFn();
         currentMultiplier=Double.parseDouble((currencyPreference.
-                getData(Constants.CURRENT_MULTIPLIER).equals(""))? "1.0":currencyPreference.getData(Constants.CURRENT_MULTIPLIER));
+                getData(Constants.CURRENT_MULTIPLIER).equals("1"))? "1.0":currencyPreference.getData(Constants.CURRENT_MULTIPLIER));
     }
     @Override
     public LiveData<ArrayList<ListItems>> getCurrencyList()
@@ -108,7 +108,7 @@ public class CurrencyViewModel extends ViewModel  implements CurrencyViewModelIn
                     @Override
                     public void onNext(Long value) {
 
-                        String rate = (currencyPreference.getData(Constants.CURRENT_RATE).equals("")) ? "EUR" : currencyPreference.getData(Constants.CURRENT_RATE);
+                        String rate = (currencyPreference.getData(Constants.CURRENT_RATE).equals("1")) ? "EUR" : currencyPreference.getData(Constants.CURRENT_RATE);
                         updateRepeateMode(rate);
 
                         //isError.setValue(false);
@@ -158,7 +158,7 @@ public class CurrencyViewModel extends ViewModel  implements CurrencyViewModelIn
                 DecimalFormat decimalFormat = new DecimalFormat("#,##0.0000");
                 List<CurrencyRates> listCurrencyRates=new ArrayList<>();
                 currentMultiplier=Double.parseDouble((currencyPreference.
-                        getData(Constants.CURRENT_MULTIPLIER).equals(""))? "1.0":currencyPreference.getData(Constants.CURRENT_MULTIPLIER));
+                        getData(Constants.CURRENT_MULTIPLIER).equals("1"))? "1.0":currencyPreference.getData(Constants.CURRENT_MULTIPLIER));
                 CurrencyRates firstRate=new CurrencyRates(mainRate,currentMultiplier);
 
 
